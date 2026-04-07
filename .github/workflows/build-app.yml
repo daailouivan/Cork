@@ -22,6 +22,8 @@ jobs:
       
       - name: Install Tuist
         run: ~/.local/bin/mise install tuist@4.50.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Select Xcode
         run: sudo xcode-select -switch /Applications/Xcode_16.0.app
