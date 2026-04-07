@@ -14,19 +14,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Select Xcode 16.1
+        run: sudo xcode-select -switch /Applications/Xcode_16.1.app || sudo xcode-select -switch /Applications/Xcode.app
+      
+      - name: Verify Swift Version
+        run: swift --version
+      
       - name: Install Mise
         run: curl https://mise.run | sh
       
       - name: Initialize Mise
-        run: echo 'eval "$($HOME/.local/bin/mise activate zsh)"' >> $HOME/.zshrc
+        run: echo 'eval "$($HOME/.local/bin/mise activate zsh)"' >> $HOME/.zshrc && source $HOME/.zshrc
       
       - name: Install Tuist
         run: ~/.local/bin/mise install tuist@4.50.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Select Xcode
-        run: sudo xcode-select -switch /Applications/Xcode_16.0.app
       
       - name: Install Dependencies
         run: ~/.local/bin/mise exec tuist@4.50.2 -- tuist install
