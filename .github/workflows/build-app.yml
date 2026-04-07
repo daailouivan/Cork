@@ -24,6 +24,7 @@ jobs:
         run: curl https://mise.run | sh
       
       - name: Initialize Mise
+        shell: zsh {0}
         run: echo 'eval "$($HOME/.local/bin/mise activate zsh)"' >> $HOME/.zshrc && source $HOME/.zshrc
       
       - name: Install Tuist
