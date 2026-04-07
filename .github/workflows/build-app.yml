@@ -1,0 +1,54 @@
+name: Build macOS App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Mise
+        run: curl https://mise.run | sh
+      
+      - name: Initialize Mise
+        run: echo 'eval "$($HOME/.local/bin/mise activate zsh)"' >> $HOME/.zshrc
+      
+      - name: Install Tuist
+        run: ~/.local/bin/mise install tuist@4.50.2
+      
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_16.0.app
+      
+      - name: Install Dependencies
+        run: ~/.local/bin/mise exec tuist@4.50.2 -- tuist install
+      
+      - name: Generate Xcode Project
+        run: ~/.local/bin/mise exec tuist@4.50.2 -- tuist generate --no-binary-cache
+      
+      - name: Build Archive
+        run: |
+          xcodebuild archive \
+            -scheme Cork \
+            -configuration Release \
+            -archivePath build/Cork.xcarchive \
+            -allowProvisioningUpdates
+      
+      - name: Export App
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath build/Cork.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build/Release
+      
+      - name: Upload App Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cork.app
+          path: build/Release/Cork.app
